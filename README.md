@@ -1,4 +1,4 @@
-# DJ Boot Sensor Project
+# DJ booth Sensor Project
 
 ## Project Background
 
@@ -85,5 +85,3 @@ This project uses the **DS18B20 temperature sensor** and an **I2C LCD** to displ
 - **delay(1000)**: Delays the loop for 1 second, causing the display to update every second.
 
 The code is designed to be flexible and could be easily extended to handle additional sensors or display features.
-
----
