@@ -2,6 +2,9 @@
 #include <DallasTemperature.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
+#include <RTClib.h>
+
+RTC_DS3231 rtc; // Real-time module
 
 #define ONE_WIRE_BUS 2  // Data cable on D2
 
@@ -13,56 +16,77 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);  // 16x2 LCD display, I2C address: 0x27 or 0
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-// int runCounter = 0;
-
 void setup() {
-  //randomSeed(analogRead(0));  // Seed the random number generator with noise from an unused analog pin
+  // Init time module
+  Serial.begin(9600);
+  
+  String statusMessage = "";
+
+  if (!rtc.begin()) {
+    statusMessage = "Couldn't find RTC";
+    Serial.println(statusMessage);
+    while (1);
+  }
+
+  if (rtc.lostPower()) {
+    // If the RTC lost power and you need to set the time, uncomment the following line and adjust the date and time.
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
+
   sensors.begin(); // Temperature sensor init
 
-  lcd.begin(16, 2);  //  Display size: 16 column és 2 row
+  lcd.begin(16, 2);  // Display size: 16 column és 2 row
   lcd.backlight();   // Backlight on
+  
+  // ***********************
+  // Version information
+  // ***********************  
   lcd.setCursor(0, 0);   // First row, first position
-  lcd.print("Welcome SIPP!");
+  lcd.print(" Version: 1.1.0 ");
+
+  lcd.setCursor(0, 1);   // Second row, first position
+  lcd.print("- Cloud Mentor -");
+  delay(2000); // Wait
+  lcd.clear(); // Clear screen
+
+  // ***********************
+  // Welcome message
+  // ***********************
+  lcd.setCursor(0, 0);   // First row, first position
+  lcd.print(" Welcome SIPP!");
 
   lcd.setCursor(0, 1);   // Second row, first position
   lcd.print("Let's get party!");
   delay(5000); // Wait
+  lcd.clear(); // Clear screen
 }
 
 void loop() {
-  //int randomNumber = random(10, 41);  // Generate a random number between 10 and 40
-  //runCounter++;
-
+  // Temp sensor
   sensors.requestTemperatures(); // Get temperature from sensor
   float temperatureC = sensors.getTempCByIndex(0); // convert it to celsius
 
-  // Convert Celsius to Fahrenheit
-  float temperatureF = temperatureC * 9.0 / 5.0 + 32.0;
+  // Time module
+  char currentTime[20];
+  DateTime now = rtc.now();
+  sprintf(currentTime, "%02d:%02d:%02d (%02d-%02d)", now.hour(), now.minute(), now.second() ,now.month(), now.day()); 
 
-  String textOne = "Temp: ";
-  String rowOne = textOne + temperatureC;
-  String textTwo = "Temp: ";
-  String rowTwo = textTwo + temperatureF;
-  lcd.clear();
   // ***********************
   // First Row
   // ***********************
   lcd.setCursor(0, 0);   // First row, first position
-  lcd.print("                "); // Clear row
-  lcd.setCursor(0, 0);   // First row, first position
-  lcd.print(rowOne);
-  lcd.print(" "); // Print a space
-  lcd.print((char) 223); // º character
-  lcd.print("C"); // Celsius
+  lcd.print(currentTime);
+
   // ***********************
   // Second Row
   // ***********************
+  String tempRow = " Temp: " + String(temperatureC, 1);  // Limit to 1 decimal point
   lcd.setCursor(0, 1);   // Second row, first position
-  lcd.setCursor(0, 1);   // Second row, first position
-  lcd.print(rowTwo);
+  lcd.print(tempRow);
   lcd.print(" "); // Print a space
   lcd.print((char) 223); // º character
-  lcd.print("F"); // Farenheit
-  delay(1000);
-  
+  lcd.print("C"); // Celsius
+
+  // Wait before restart the sequence (250 ms)
+  delay(250);
 }
