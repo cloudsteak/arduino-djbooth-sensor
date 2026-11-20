@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <LiquidCrystal_I2C.h>
@@ -19,7 +20,7 @@ DallasTemperature sensors(&oneWire);
 void setup() {
   // Init time module
   Serial.begin(9600);
-  
+
   String statusMessage = "";
 
   if (!rtc.begin()) {
@@ -37,10 +38,10 @@ void setup() {
 
   lcd.begin(16, 2);  // Display size: 16 column és 2 row
   lcd.backlight();   // Backlight on
-  
+
   // ***********************
   // Version information
-  // ***********************  
+  // ***********************
   lcd.setCursor(0, 0);   // First row, first position
   lcd.print(" Version: 1.1.0 ");
 
@@ -69,7 +70,7 @@ void loop() {
   // Time module
   char currentTime[20];
   DateTime now = rtc.now();
-  sprintf(currentTime, "%02d:%02d:%02d (%02d-%02d)", now.hour(), now.minute(), now.second() ,now.month(), now.day()); 
+  sprintf(currentTime, "%02d:%02d:%02d (%02d-%02d)", now.hour(), now.minute(), now.second() ,now.month(), now.day());
 
   // ***********************
   // First Row
