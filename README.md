@@ -19,24 +19,21 @@ The code leverages the I2C protocol to communicate with the LCD and the **Dallas
 
 ## Prerequisites and Installation
 
-Project directory: ./djbooth_sensor
+Firmware lives in `src/main.cpp` and is built with [PlatformIO](https://platformio.org/).
 
-### 1. Install Required Libraries:
+Target board: **AR-NANOCH-TYPE-C** (ATmega328P, CH340, USB Type-C). This board uses the new bootloader, so the default environment is `sipp_djbooth_sensor` (Arduino IDE: **Processor → ATmega328P**, 115200 baud).
 
-You need to install the following libraries using the Arduino IDE's Library Manager:
+Libraries (pulled automatically from `platformio.ini`):
 
-- **OneWire**: Used for communicating with the DS18B20 temperature sensor.
-- **DallasTemperature**: Simplifies reading from the DS18B20 sensor.
-- **LiquidCrystal_I2C**: For controlling the 16x2 LCD display via I2C.
-- **Wire**: Required for I2C communication.
+- **OneWire** — DS18B20 bus
+- **DallasTemperature** — DS18B20 readings
+- **LiquidCrystal_I2C** — 16x2 LCD over I2C
+- **RTClib** — DS3231 real-time clock
+- **Wire** — built into the Arduino framework
 
-To install these libraries:
+On Windows, install the [WCH CH340 driver](https://www.wch-ic.com/downloads/CH341SER_EXE.html) if the board does not show up as a COM port.
 
-1. Open Arduino IDE.
-2. Go to **Sketch** -> **Include Library** -> **Manage Libraries**.
-3. Search for each of the required libraries and click **Install**.
-
-### 2. Hardware Connections:
+### Hardware connections
 
 - **DS18B20** connections:
 
@@ -57,14 +54,23 @@ To install these libraries:
   - **SDA**: Connect to Arduino's **A4**.
   - **SCL**: Connect to Arduino's **A5**.
 
-### 3. Code Upload:
+### Build and upload
 
-Once the hardware is connected and the libraries are installed:
+From the project root, with the Nano plugged in over USB-C:
 
-1. Open the **Arduino IDE**.
-2. Copy the provided code into the IDE.
-3. Select the correct board (`Arduino Nano`) and port under **Tools**.
-4. Upload the code to the Arduino.
+```bash
+pio run              # compile
+pio run -t upload    # flash (COM port is detected automatically)
+pio device monitor   # serial log at 9600 baud
+```
+
+In the PlatformIO IDE extension the same actions are **Build**, **Upload**, and **Monitor**. The board shows up as **USB-SERIAL CH340**.
+
+If upload stops at `stk500_recv(): programmer is not responding`, that board has the old bootloader. Upload with:
+
+```bash
+pio run -e nano -t upload
+```
 
 ## What This Code Does
 
