@@ -56,21 +56,31 @@ On Windows, install the [WCH CH340 driver](https://www.wch-ic.com/downloads/CH34
 
 ### Build and upload
 
-From the project root, with the Nano plugged in over USB-C:
+From the project root, with the Nano plugged in over USB-C. The board shows up as **USB-SERIAL CH340**. In the PlatformIO IDE extension, pick the environment under **Project Tasks**, then use **Build**, **Upload**, and **Monitor**.
+
+`pio run` and `pio run -t upload` without `-e` use the default environment, `sipp_djbooth_sensor`.
+
+#### `sipp_djbooth_sensor` (default)
+
+AR-NANOCH-TYPE-C with the new bootloader. PlatformIO board `nanoatmega328new`, upload at 115200 baud. Arduino IDE: **Processor → ATmega328P**.
 
 ```bash
-pio run              # compile
-pio run -t upload    # flash (COM port is detected automatically)
-pio device monitor   # serial log at 9600 baud
+pio run -e sipp_djbooth_sensor
+pio run -e sipp_djbooth_sensor -t upload
+pio device monitor -e sipp_djbooth_sensor
 ```
 
-In the PlatformIO IDE extension the same actions are **Build**, **Upload**, and **Monitor**. The board shows up as **USB-SERIAL CH340**.
+#### `nano`
 
-If upload stops at `stk500_recv(): programmer is not responding`, that board has the old bootloader. Upload with:
+Same firmware for a Nano with the old bootloader. PlatformIO board `nanoatmega328`, upload at 57600 baud. Arduino IDE: **Processor → ATmega328P (Old Bootloader)**.
 
 ```bash
+pio run -e nano
 pio run -e nano -t upload
+pio device monitor -e nano
 ```
+
+Use this environment when upload with `sipp_djbooth_sensor` stops at `stk500_recv(): programmer is not responding`.
 
 ## What This Code Does
 
